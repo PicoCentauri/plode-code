@@ -212,12 +212,9 @@ rad = KspaceRadialBasis(
 k_cut = 1.2 * np.pi / hypers_lr["atomic_gaussian_width"]
 spline_points = rad.spline_points(cutoff_radius=k_cut, requested_accuracy=1e-8)
 
-hypers_lr["radial_basis"] = {
-    "TabulatedRadialIntegral": {
-        "points": spline_points,
-        "center_contribution": [0.0 for _ in range(hypers_lr["max_radial"])],
-    }
-}
+hypers_lr["radial_basis"] = rad.spline_points(
+    cutoff_radius=k_cut, requested_accuracy=1e-8
+)
 
 # LODE 1
 hypers_lr["potential_exponent"] = 1
