@@ -1,4 +1,5 @@
-# forces CPU torch
+# pytorch by default uses GPUs.
+# If you need / prefer to run on CPUs instead, run:
 --extra-index-url https://download.pytorch.org/whl/cpu
 
 ase

@@ -2,11 +2,12 @@
 LODE Tutorial
 =============
 
-This tutorial explains how Long range equivariant descriptors can be constructed using
-rascaline and the resulting descriptors be used to construct a linear model with
-equisolve
-
-First, import all the necessary packages
+This file builds a linear model to predict the
+energy and foces of the structures contained in the
+dataset.
+The linear model is based on multi-scale features,
+which combine both a short-range (SR) part (as in SOAP)
+and LODE coefficients capturing the long-range (LR) part.
 """
 
 # %%
@@ -29,8 +30,9 @@ from rascaline.utils import PowerSpectrum
 # Get structures
 # ~~~~~~~~~~~~~~
 #
-# We take a small subset of the dimer dataset from `A. Grisafi et al.,
-# 2021 <https://pubs.rsc.org/en/content/articlelanding/2021/sc/d0sc04934d>`_
+# We take a small subset of the dimer dataset originally introduced in
+# `A. Grisafi et al., 2021
+# <https://pubs.rsc.org/en/content/articlelanding/2021/sc/d0sc04934d>`_
 # for which we additionally calculated the forces. Each structure in the
 # dataset contains two small organic molecules which are extended along a
 # certain direction in the subsequent structures.
@@ -43,13 +45,16 @@ dataset = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "datase
 frames = ase.io.read(f"{dataset}/charge-charge.xyz", ":")
 
 
-# %% Convert target properties to metatensor format
+# %% Convert target properties into metatensor format
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# metatensor is the name of a data storage format for
+# atomistic machine learning developed by lab-cosmo.
 #
 # If we want to train models using the
 # `equisolve <https://github.com/lab-cosmo/equisolve>`_ package, we need to
 # convert the target properties (in this case, the energies and forces)
-# into the appropriate format #justmetatensorthings
+# into this format #justmetatensorthings
 #
 
 y = ase_to_tensormap(frames, energy="energy", forces="forces")
@@ -58,37 +63,31 @@ y = ase_to_tensormap(frames, energy="energy", forces="forces")
 # %% Step 1: Compute short-range (SR) and LODE features
 # --------------------------------------------------
 #
-# Define hypers and get the expansion coefficients :math:`\langle anlm | \rho_i \rangle`
-# and :math:`\langle anlm | V_i \rangle`
+# Define hypers and get the coefficients of both LODE and SR descriptors
 #
-# The short-range and long-range descriptors have very similar hyperparameters. We
-# highlight the differences below.
-#
-# We first define the hyperparameters for the short-range part. These will be used to
+# We first define the hyperparameters for the SR part. These will be used to
 # create SOAP features.
 #
 
 SR_HYPERS = {
     "cutoff": 3.,
     "max_radial": 6,
-    "max_angular": 2,
+    "max_angular": 1,
     "atomic_gaussian_width": 0.3,
     "center_atom_weight": 1.0,
     "radial_basis": {"Gto": {}},
     "cutoff_function": {"ShiftedCosine": {"width": 0.5}},
 }
 
-
 # %% And next the hyperparaters for the LODE / long-range (lr) part
-
 
 LR_HYPERS = {
      # Cutoff on which to project potential density
     'cutoff': 3.,
     # keep max_radial slightly smaller than for SR part
-    'max_radial': 3,
-    # max_angular should be <= 4, more precisely, max_angular + potential_exponent < 10
-    'max_angular': 2,
+    'max_radial': 1,
+    # max_angular recommended to be <= 4
+    'max_angular': 1,
      # keep at >=1, WARNING: CUBIC SCALING, do not use values <0.5
     'atomic_gaussian_width': 3.,
     "center_atom_weight": 1.0,
@@ -97,15 +96,13 @@ LR_HYPERS = {
     'potential_exponent': 1,
 }
 
-
-# %% We then use the above defined hyperparaters to define the per atom short range (sr)
-# and long range (sr) descriptors.
+# %% We then use the above defined hyperparaters to define the per atom SR
+# and LR descriptors.
 
 calculator_sr = SphericalExpansion(**SR_HYPERS)
 calculator_lr = LodeSphericalExpansion(**LR_HYPERS)
 
-
-# %% Note that LODE requires periodic systems. Therefore, if the data set does not come
+# %% Note that LODE requires periodic systems. Therefore, if the dataset does not come
 # with periodic boundary conditions by default you can not use the data set and you will
 # face an error if you try to compute the features.
 #
@@ -129,13 +126,13 @@ ps_calculator_sr = PowerSpectrum(calculator_sr, calculator_sr)
 ps_sr = ps_calculator_sr.compute(frames, gradients=["positions"])
 
 
-# %% We calculate gradients with respect to pistions by providing the
+# %% We calculate gradients with respect to postions by providing the
 # ``gradients=["positions"]`` option to the
 # :py:meth:`rascaline.calculators.CalculatorBase.compute()` method.
 
 
-# %% For the long-range part, we combine the long-range descriptor :math:`V` with one a
-# short-range density :math:`\rho` to get :math:`\rho \otimes V` features.
+# %% For the LR part, we combine the long-range descriptor :math:`V` with one a
+# SR density :math:`\rho` to get :math:`\rho \otimes V` features.
 
 ps_calculator_lr = PowerSpectrum(calculator_sr, calculator_lr)
 ps_lr = ps_calculator_lr.compute(systems=frames, gradients=["positions"])

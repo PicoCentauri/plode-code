@@ -30,8 +30,8 @@ pip install -r requirements_rascaline.txt
 ## Usage
 
 The [examples](examples) folder contains Python source code to train and evaluate the
-linear ad well as neural network (nn) potential based on LODE descripotors. For the
-examples in this repository we take a small subset of the dimer dataset from the work.
+linear as well as neural network (nn) potential based on LODE descriptors. For the
+examples in this repository we take a small subset of the dimer dataset from the main publication.
 The complete data set is available for download at [Materials
 Cloud](https://doi.org/10.24435/materialscloud:23-99).
 
