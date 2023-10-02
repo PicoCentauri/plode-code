@@ -1,0 +1,9 @@
+# forces CPU torch
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+ase
+equisolve @ https://github.com/lab-cosmo/equisolve/archive/c4ae847.zip
+matplotlib
+numpy
+scikit-learn
+torch
