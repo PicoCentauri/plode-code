@@ -194,7 +194,7 @@ calculator_soap = SphericalExpansion(**hypers_sr)
 try:
     descriptor_soap = metatensor.load(PREFIX + "-descriptor_soap.npz")
 except:
-    print(" ... didn't find restart")
+    print("Features have not been precomputed yet. Generate them from scratch.")
     ps_soap = PowerSpectrum(calculator_soap)
     descriptor_soap = ps_soap.compute(combined_frames)
     descriptor_soap = descriptor_soap.keys_to_properties("species_center")
@@ -233,7 +233,7 @@ print("Computing V1i")
 try:
     descriptor_lode1 = metatensor.load(PREFIX + "-descriptor_lode1.npz")
 except:
-    print(" ... didn't find restart")
+    print("Features have not been precomputed yet. Generate them from scratch.")
     calculator_lode1 = PowerSpectrum(
         calculator_soap, LodeSphericalExpansion(**hypers_lr)
     )
@@ -247,7 +247,7 @@ print("Computing V3i")
 try:
     descriptor_lode3 = metatensor.load(PREFIX + "-descriptor_lode3.npz")
 except:
-    print(" ... didn't find restart")
+    print("Features have not been precomputed yet. Generate them from scratch.")
     calculator_lode3 = PowerSpectrum(
         calculator_soap, LodeSphericalExpansion(**hypers_lr)
     )
@@ -261,7 +261,7 @@ print("Computing V6i")
 try:
     descriptor_lode6 = metatensor.load(PREFIX + "-descriptor_lode6.npz")
 except:
-    print(" ... didn't find restart")
+    print("Features have not been precomputed yet. Generate them from scratch.")
     calculator_lode6 = PowerSpectrum(
         calculator_soap, LodeSphericalExpansion(**hypers_lr)
     )
