@@ -3,7 +3,7 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 
 ase
-equisolve @ https://github.com/lab-cosmo/equisolve/archive/23d6680.zip
+equisolve @ https://github.com/lab-cosmo/equisolve/archive/ddf12d8.zip
 matplotlib
 numpy
 scikit-learn
